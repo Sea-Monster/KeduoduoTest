@@ -4,11 +4,11 @@ import mainpage_test
 import orders_center_test
 from selenium import webdriver
 from login_test import LoginPage
+from mainpage_test import MainPage
 
 
 if __name__ == '__main__':
     browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver')
-    # login_keduoduo(browser)
     # o1 = mainpage_test.shop_analysis(browser)
     # o2 = mainpage_test.sell_analysis(browser)
     # export_dict_to_json(o1._asdict(), '店铺经营分析.json')
@@ -17,5 +17,8 @@ if __name__ == '__main__':
 
     login = LoginPage(browser)
     login.execute()
+    main_page = MainPage(browser)
+    main_page.execute()
+
 
     browser.quit()

@@ -42,7 +42,3 @@ class LoginPage(BasePage):
         self.wait_until(locator_text='totalCount')
 
         self.execute_script("toLogin('爱斯贝绮')")
-
-        self.wait(5)
-
-        self.save_screenshot('测试')
