@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import datetime
 import time
 from selenium.webdriver.remote.webelement import WebElement
-from common import file_utils
+from common import file_utils, log_utils
 
 
 class BasePage(object):
@@ -105,7 +105,12 @@ class BasePage(object):
         :return:
         """
         br: WebDriver = browser if browser is not None else self.browser
-        return br.find_element_by_css_selector(css_selector)
+        try:
+            return br.find_element_by_css_selector(css_selector)
+        except Exception as e:
+            log_utils.error('find element by css fail : {0}'.format(css_selector))
+            log_utils.error(e)
+            raise e
 
     def find_elements_by_css_selector(self, css_selector, browser=None):
         """
@@ -115,7 +120,12 @@ class BasePage(object):
         :return:
         """
         br: WebDriver = browser if browser is not None else self.browser
-        return br.find_elements_by_css_selector(css_selector)
+        try:
+            return br.find_elements_by_css_selector(css_selector)
+        except Exception as e:
+            log_utils.error('find elements by css fail : {0}'.format(css_selector))
+            log_utils.error(e)
+            raise e
 
     def _set_browser(self, browser):
         br: WebDriver = browser if browser is not None else self.browser

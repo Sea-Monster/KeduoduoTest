@@ -1,6 +1,21 @@
 # -*- coding: utf-8 -*-
 import json
 from .settings import *
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+
+def debug(msg, *args, **kwargs):
+    return logging.debug(msg, *args, **kwargs)
+
+
+def error(msg, *args, **kwargs):
+    logging.error(msg, *args, **kwargs)
+
+
+def warning(msg, *args, **kwargs):
+    logging.warning(msg, *args, **kwargs)
 
 
 def convert_to_json(obj):
@@ -25,6 +40,7 @@ def export_logs(obj, filename, filepath=LOGS_PATH):
     with open(filepath + filename, mode='w') as sess:
         # sess.write(s)
         json.dump(obj._asdict(), sess, ensure_ascii=False, indent='\t')
+
 
 if __name__ == '__main__':
     pass
