@@ -2,97 +2,101 @@
 # 订单中心
 
 from base.page import BasePage
-import time
-from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from common.image_utils import screen_shoot
-from selenium.webdriver.common.action_chains import ActionChains
-
-def order_query_test(browser):
-    """
-
-    :type browser: WebDriver
-    """
-    order_center_url = 'http://14.119.106.43:8300/kdd/main.jsp?menu=order&id=ddcx'
-    browser.get(order_center_url)
-    _order_today_query_test(browser)
-
-
-def _order_today_query_test(browser):
-    """
-
-    :type browser: WebDriver
-    """
-    # 点击今日订单
-    browser.switch_to.frame('main')
-    WebDriverWait(browser, 10, 0.5).until(
-        EC.presence_of_element_located((By.ID, 'settTitle'))
-    )
-
-    # time.sleep(1)
-    browser.find_element_by_css_selector('#settTitle>ul>li:nth-child(2)>a').click()
-    # browser.execute_script("window.parent.order_day('order_center.jsp?str=TodayTheOrder','所有订单,order_center.jsp?str=allOrder,今日订单,order_center.jsp?str=TodayTheOrder');")
-    time.sleep(3)
-    # WebDriverWait(browser, 5, 0.5).until(
-    #     EC.presence_of_element_located((By.ID, 'totalCount'))
-    # )
-    totalCount_element = browser.find_element_by_css_selector('#totalCount')
-    totalCount = int(totalCount_element.text) if totalCount_element.text!='' else 0
-    print('今日订单数：' + str(totalCount))
-
-    for i in range(2, 502):
-        try:
-            click_element = browser.find_element_by_css_selector(
-            '#tab2 tr:nth-child({0})>td:nth-child(12)>a'.format(str(i)))
-            ActionChains(browser).move_to_element(click_element).perform()  # 先悬停
-            time.sleep(1)
-            click_element.click()
-            _order_detail_test(browser)
-            time.sleep(1)
-        except Exception as e:
-            print(e)
-            break
-
-
-def _order_detail_test(browser):
-    """
-    订单详情
-    :param browser:
-    :return:
-    """
-    time.sleep(1)
-    iframe = browser.find_element_by_css_selector('.cboxIframe')
-    browser.switch_to_frame(iframe)
-    order_id = browser.find_element_by_css_selector('body>.wrapBox>.colorbox_rcon>.rconc>div:nth-child(2) table tr:nth-child(1)>td:nth-child(2)').text
-    screen_shoot(browser, filename='订单' + order_id + 'A.png')
-
-    js = "document.documentElement.scrollTop=800"
-    browser.execute_script(js)
-
-    screen_shoot(browser, filename='订单' + order_id + 'B.png')
-
-    browser.switch_to.default_content()
-    iframe = browser.find_element_by_css_selector('#main')
-    browser.switch_to.frame(iframe)
-
-    close_element = browser.find_element_by_css_selector('#cboxClose')
-    ActionChains(browser).move_to_element(close_element).perform()
-    time.sleep(3)
-    close_element.click()
+from common import log_utils
 
 
 class OrderCenterPage(BasePage):
     """
-    订单中心
+    订单中心（订单查询）
     """
     _order_center_url = 'http://14.119.106.43:8300/kdd/main.jsp?menu=order&id=ddcx'
+    #_order_center_url = 'http://14.119.106.43:8300/kdd/order_center.jsp?str=allOrder'
+
+    _frame_id = 'main'
+
+    # --------  操作位置 -----------------
+    # 今日订单
+    # _locate_today_order_id = 'settTitle'
+    _locate_today_order = '#settTitle>ul>li:nth-child(2)>a'
+    # 每页条数
+    _locate_page_rows = '#pageRows'
+    _locate_page_rows_500 = _locate_page_rows + '>option:nth-child(5)'
+    # 订单数
+    _locate_total_count = '#totalCount'
+    _locate_order_detail_frame = '.cboxIframe'
+
+    # --------  操作位置 结束--------------
 
     def __init__(self, browser=None, catalog='订单中心'):
-        super().__init__(browser, catalog)
+        super(OrderCenterPage, self).__init__(browser, catalog)
 
     def execute(self, browser=None):
-        return super().execute(browser)
+        self.browser.get(self._order_center_url)
+        # 切换到右侧的主iFrame
+        self.switch_to_frame(self._frame_id)
+        self._query_order_today()
+
+    def _query_order_today(self, browser=None):
+        """
+        查询今天订单
+        :param browser:
+        :return:
+        """
+        if browser is None:
+            browser = self.browser
+        ele = self.find_element_by_css_selector(self._locate_today_order, throw=True)
+        # self.click(ele)
+        totalCount_element = self.find_element_by_css_selector(self._locate_total_count)
+        # 如果成功查到数据
+        if totalCount_element and totalCount_element.text != '':
+            log_utils.info('今日订单数：' + totalCount_element.text)
+            # 每页条数设为500条
+            ele = self.find_element_by_css_selector(self._locate_page_rows_500)
+            self.click(ele)
+            # 遍历订单记录
+            locate_view_detail = '#tab2 tr:nth-child({0})>td:nth-child(12)>a'
+            for i in range(2, 502):
+                try:
+                    ele = self.find_element_by_css_selector(locate_view_detail.format(str(i)), throw=True)
+                    self.click(ele, need_hold=True)
+                    self._show_order_detail()
+                    self.wait(1)
+                except:
+                    break
+
+    def _show_order_detail(self, browser=None):
+        """
+        订单详情
+        :param browser:
+        :return:
+        """
+        # 关闭按钮
+        locate_close = '#cboxClose'
+
+        iFrame = self.find_element_by_css_selector(self._locate_order_detail_frame)
+        self.switch_to_frame(iFrame)
+        js = 'document.getElementsByClassName("cboxIframe")[0].scrollTop=300'
+        self.execute_script(js)
+
+        self.switch_to_default_content()
+        iFrame = self.find_element_by_css_selector(self._frame_id)
+        self.switch_to_frame(iFrame)
+
+        # 关闭
+        ele = self.find_element_by_css_selector(locate_close)
+        self.click(ele, need_hold=True)
 
 
+if __name__ == '__main__':
+    from selenium import webdriver
+    from login_test import LoginPage
+
+    chrome_opt = webdriver.ChromeOptions()
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    chrome_opt.add_experimental_option("prefs", prefs)
+    browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver',
+                               chrome_options=chrome_opt)
+    login = LoginPage(browser)
+    login.execute()
+    order = OrderCenterPage(browser)
+    order.execute()

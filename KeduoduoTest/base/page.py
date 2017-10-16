@@ -19,6 +19,9 @@ class BasePage(object):
     LOGIN_URL = 'http://14.119.106.43:8250/login.jsp'
     SELL_LIST_URL = 'http://14.119.106.43:8250/tbSellerList.jsp'
     MAIN_PAGE = 'http://14.119.106.43:8300/kdd/home.jsp'
+    # 隐式等待秒数
+    WAIT_SECONDS = 10
+    # 点击前鼠标悬停秒数
     HOLD_SECONDS = 1
 
     def __init__(self, browser=None, catalog=None):
@@ -28,6 +31,10 @@ class BasePage(object):
         :param browser: 
         """
         self._browser = browser
+
+        if self._browser is not None:
+            self._browser.implicitly_wait(self.WAIT_SECONDS)
+
         if callable is None:
             self._catalog = '未分类'
         else:
@@ -78,7 +85,11 @@ class BasePage(object):
         :return:
         """
         br: WebDriver = browser if browser is not None else self.browser
-        return br.execute_script(script, *args)
+        try:
+            return br.execute_script(script, *args)
+        except Exception as e:
+            log_utils.error(e)
+            raise e
 
     def switch_to_frame(self, frame_reference, browser=None):
         """
@@ -99,9 +110,10 @@ class BasePage(object):
         br: WebDriver = browser if browser is not None else self.browser
         return br.switch_to.default_content()
 
-    def find_element_by_css_selector(self, css_selector, browser=None):
+    def find_element_by_css_selector(self, css_selector, browser=None, throw=False):
         """
 
+        :param throw: 是否向上抛出异常
         :param css_selector:
         :param browser:
         :return:
@@ -112,11 +124,13 @@ class BasePage(object):
         except Exception as e:
             log_utils.error('find element by css fail : {0}'.format(css_selector))
             log_utils.error(e)
-            raise e
+            if throw:
+                raise e
 
-    def find_elements_by_css_selector(self, css_selector, browser=None):
+    def find_elements_by_css_selector(self, css_selector, browser=None, throw=False):
         """
 
+        :param throw: 是否向上抛出异常
         :param css_selector:
         :param browser:
         :return:
@@ -127,7 +141,8 @@ class BasePage(object):
         except Exception as e:
             log_utils.error('find elements by css fail : {0}'.format(css_selector))
             log_utils.error(e)
-            raise e
+            if throw:
+                raise e
 
     def click(self, element, need_hold=False, browser=None):
         """

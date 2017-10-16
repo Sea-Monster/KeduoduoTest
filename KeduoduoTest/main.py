@@ -13,14 +13,16 @@ from selenium import webdriver
 from login_test import LoginPage
 from mainpage_test import MainPage
 
-
 if __name__ == '__main__':
-    chrome_opt = webdriver.ChromeOptions()
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    chrome_opt.add_experimental_option("prefs", prefs)
 
-    # browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver')
-    browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver', chrome_options=chrome_opt)
+    if len(sys.argv)>1 and sys.argv[1] == 'nopic':
+        chrome_opt = webdriver.ChromeOptions()
+        prefs = {"profile.managed_default_content_settings.images": 2}
+        chrome_opt.add_experimental_option("prefs", prefs)
+        browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver',
+                                   chrome_options=chrome_opt)
+    else:
+        browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver')
 
     print(browser.get_window_size())
     browser.maximize_window()
@@ -34,6 +36,5 @@ if __name__ == '__main__':
     login.execute()
     main_page = MainPage(browser)
     main_page.execute()
-
 
     browser.quit()

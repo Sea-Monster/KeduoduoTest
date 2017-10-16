@@ -11,11 +11,15 @@ def debug(msg, *args, **kwargs):
 
 
 def error(msg, *args, **kwargs):
-    logging.error(msg, *args, **kwargs)
+    return logging.error(msg, *args, **kwargs)
 
 
 def warning(msg, *args, **kwargs):
-    logging.warning(msg, *args, **kwargs)
+    return logging.warning(msg, *args, **kwargs)
+
+
+def info(msg, *args, **kwargs):
+    return logging.info(msg, *args, **kwargs)
 
 
 def convert_to_json(obj):
