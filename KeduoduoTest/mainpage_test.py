@@ -44,7 +44,8 @@ class MainPage(BasePage):
     def execute(self, browser=None):
         super()._set_browser(browser)
         self.browser.get(self.MAIN_PAGE)
-        self.wait(3)
+        # self.wait(3)
+        self.wait_until(locator_text='yxVal1')
         try:
             self._shop_analysis()
         except Exception as e:
@@ -148,18 +149,17 @@ class MainPage(BasePage):
         locale_data_trend_week = 'body > div.content > div.wrapperLeft > div.leftD3 > div.dataTitle > ul > li:nth-child(4) > a'
         locale_data_trend_month = 'body > div.content > div.wrapperLeft > div.leftD3 > div.dataTitle > ul > li:nth-child(5) > a'
         self.find_element_by_css_selector(locale_data_trend_today).click()
-        self.wait(1)
+        self.wait(2)
         self.save_screenshot('数据趋势分析区-当天')
         self.find_element_by_css_selector(locale_data_trend_yesterday).click()
-        self.wait(1)
+        self.wait(2)
         self.save_screenshot('数据趋势分析区-昨天')
         self.find_element_by_css_selector(locale_data_trend_week).click()
-        self.wait(1)
+        self.wait(2)
         self.save_screenshot('数据趋势分析区-本周')
         self.find_element_by_css_selector(locale_data_trend_month).click()
-        self.wait(1)
+        self.wait(2)
         self.save_screenshot('数据趋势分析区-本月')
-
 
     def _get_attrs(self, browser):
         """

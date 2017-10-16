@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # 订单中心
 
+from base.page import BasePage
 import time
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -80,4 +81,18 @@ def _order_detail_test(browser):
     ActionChains(browser).move_to_element(close_element).perform()
     time.sleep(3)
     close_element.click()
+
+
+class OrderCenterPage(BasePage):
+    """
+    订单中心
+    """
+    _order_center_url = 'http://14.119.106.43:8300/kdd/main.jsp?menu=order&id=ddcx'
+
+    def __init__(self, browser=None, catalog='订单中心'):
+        super().__init__(browser, catalog)
+
+    def execute(self, browser=None):
+        return super().execute(browser)
+
 

@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
+
+# sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from common.log_utils import convert_to_json, export_logs, export_dict_to_json
 import mainpage_test
 import orders_center_test
@@ -8,7 +15,13 @@ from mainpage_test import MainPage
 
 
 if __name__ == '__main__':
-    browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver')
+    chrome_opt = webdriver.ChromeOptions()
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    chrome_opt.add_experimental_option("prefs", prefs)
+
+    # browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver')
+    browser = webdriver.Chrome(executable_path='/Users/SeaMonster/Downloads/chromedriver', chrome_options=chrome_opt)
+
     print(browser.get_window_size())
     browser.maximize_window()
     # o1 = mainpage_test.shop_analysis(browser)
