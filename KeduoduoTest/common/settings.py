@@ -8,3 +8,5 @@ IMAGE_SUBFIX_DEFAULT = '.png'
 LOGS_PATH = '/Users/SeaMonster/PycharmProjects/KeduoduoTest/logs/'
 USER_NAME = cf.get('AUTH','user_name')
 PASSWORD = cf.get('AUTH','password')
+BASE_URL = cf.get('URL', 'base_url')
+BASE_LOGIN_URL = cf.get('URL', 'base_login_url')

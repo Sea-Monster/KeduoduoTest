@@ -38,7 +38,6 @@ class MainPage(BasePage):
     _SellDatas = collections.namedtuple('SellDatas', ['最近一次', '当天', '本周', '本月'])
 
     def __init__(self, browser=None, catalog='首页'):
-        self.Fuck = ''
         super().__init__(browser, catalog)
 
     def execute(self, browser=None):

@@ -2,7 +2,7 @@
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from KeduoduoTest.common.settings import IMAGE_PATH, LOGS_PATH, IMAGE_SUBFIX_DEFAULT
+from KeduoduoTest.common.settings import IMAGE_PATH, LOGS_PATH, IMAGE_SUBFIX_DEFAULT, BASE_URL, BASE_LOGIN_URL
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import datetime
@@ -10,15 +10,16 @@ import time
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.action_chains import ActionChains
 from common import file_utils, log_utils
+from selenium.webdriver.common.keys import Keys
 
 
 class BasePage(object):
     """
     用于所有页面的继承
     """
-    LOGIN_URL = 'http://14.119.106.43:8250/login.jsp'
-    SELL_LIST_URL = 'http://14.119.106.43:8250/tbSellerList.jsp'
-    MAIN_PAGE = 'http://14.119.106.43:8300/kdd/home.jsp'
+    LOGIN_URL = BASE_LOGIN_URL + 'login.jsp'
+    SELL_LIST_URL = BASE_LOGIN_URL + 'tbSellerList.jsp'
+    MAIN_PAGE = BASE_URL + 'kdd/home.jsp'
     # 隐式等待秒数
     WAIT_SECONDS = 10
     # 点击前鼠标悬停秒数
@@ -196,6 +197,61 @@ class BasePage(object):
             EC.presence_of_element_located((locator_by, locator_text))
         )
         return element
+
+    def get(self, relative_url, browser=None):
+        """
+        Get 指定相对网址
+        :param relative_url:
+        :param browser:
+        :return:
+        """
+        br: WebDriver = browser if browser is not None else self.browser
+        return br.get(BASE_URL + relative_url)
+
+    def get_absolute(self, url, browser=None):
+        """
+        Get 指定绝对网址
+        :param url:
+        :param browser:
+        :return:
+        """
+        br: WebDriver = browser if browser is not None else self.browser
+        return br.get(url)
+
+    def open_new_tab(self, url=None, browser=None):
+        """
+        打开新标签页
+        :param url:
+        :param browser:
+        :return: 旧的标签页，新打开的标签页
+        """
+        if url is None:
+            return
+        br: WebDriver = browser if browser is not None else self.browser
+        old_handle = self._browser.current_window_handle
+        old_handles = [item for item in self._browser.window_handles]
+        self.execute_script('window.open("{0}")'.format(BASE_URL + url))
+        new_handles = [item for item in self._browser.window_handles]
+        new_handle = None
+        for item in new_handles:
+            if item in old_handles:
+                pass
+            else:
+                new_handle = item
+        return old_handle, new_handle
+        # ActionChains(br).key_down(Keys.COMMAND).send_keys('t').key_up(Keys.COMMAND).perform()
+
+    def close_new_tab(self, handles, browser=None):
+        """
+        关闭新打开的标签页
+        :param handles: 旧的标签页， 新的标签页（要关闭的那个）
+        :param browser:
+        :return:
+        """
+        br: WebDriver = browser if browser is not None else self.browser
+        br.switch_to.window(handles[1])
+        br.close()
+        br.switch_to.window(handles[0])
 
     @classmethod
     def wait(cls, sec):
