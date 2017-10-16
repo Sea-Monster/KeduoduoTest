@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import datetime
 import time
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.action_chains import ActionChains
 from common import file_utils, log_utils
 
 
@@ -18,6 +19,7 @@ class BasePage(object):
     LOGIN_URL = 'http://14.119.106.43:8250/login.jsp'
     SELL_LIST_URL = 'http://14.119.106.43:8250/tbSellerList.jsp'
     MAIN_PAGE = 'http://14.119.106.43:8300/kdd/home.jsp'
+    HOLD_SECONDS = 1
 
     def __init__(self, browser=None, catalog=None):
         """
@@ -63,7 +65,7 @@ class BasePage(object):
         file_name = '' if filename is None else filename
         # 创建路径
         file_utils.make_directory(file_path)
-        file_name = file_path + '/'+ file_name + '_' + str(now) + IMAGE_SUBFIX_DEFAULT
+        file_name = file_path + '/' + file_name + '_' + str(now) + IMAGE_SUBFIX_DEFAULT
         print('file name:' + file_name)
         return br.save_screenshot(file_name)
 
@@ -127,12 +129,41 @@ class BasePage(object):
             log_utils.error(e)
             raise e
 
-    def _set_browser(self, browser):
+    def click(self, element, need_hold=False, browser=None):
+        """
+        点击
+        :type element: WebElement
+        :param element: 元素
+        :param need_hold: 是否需要先"悬停"
+        :return:
+        """
         br: WebDriver = browser if browser is not None else self.browser
-        if self.browser is None:
-            self._browser = br
+        if need_hold:
+            ActionChains(br).move_to_element(element).perform()
+            self.wait(self.HOLD_SECONDS)
+        element.click()
+
+    def click_by_css_selector(self, css_selector, need_hold=False, browser=None):
+        """
+        点击
+        :param css_selector:
+        :param need_hold:
+        :param browser:
+        :return:
+        """
+        br: WebDriver = browser if browser is not None else self.browser
+        element = self.find_element_by_css_selector(css_selector, br)
+        if need_hold:
+            ActionChains(br).move_to_element(element).perform()
+            self.wait(self.HOLD_SECONDS)
+        element.click()
 
     def execute(self, browser=None):
+        """
+        执行特定操作(由子类决定步骤)
+        :param browser:
+        :return:
+        """
         raise NotImplemented
 
     def wait_until(self, timeout=5, poll_frequency=0.5, locator_by=By.ID, locator_text='', browser=None):
@@ -159,6 +190,11 @@ class BasePage(object):
         :return:
         """
         time.sleep(sec)
+
+    def _set_browser(self, browser):
+        br: WebDriver = browser if browser is not None else self.browser
+        if self.browser is None:
+            self._browser = br
 
 
 if __name__ == '__main__':
