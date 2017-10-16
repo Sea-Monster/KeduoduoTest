@@ -3,7 +3,6 @@
 
 from base.page import BasePage
 from common import log_utils
-from KeduoduoTest.common.settings import BASE_URL
 
 
 class OrderCenterPage(BasePage):

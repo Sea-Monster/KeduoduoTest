@@ -238,6 +238,7 @@ class BasePage(object):
                 pass
             else:
                 new_handle = item
+        br.switch_to.window(new_handle)
         return old_handle, new_handle
         # ActionChains(br).key_down(Keys.COMMAND).send_keys('t').key_up(Keys.COMMAND).perform()
 
