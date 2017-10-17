@@ -8,7 +8,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common.log_utils import convert_to_json, export_logs, export_dict_to_json
 import mainpage_test
-import orders_center_test
 from selenium import webdriver
 from login_test import LoginPage
 from mainpage_test import MainPage
