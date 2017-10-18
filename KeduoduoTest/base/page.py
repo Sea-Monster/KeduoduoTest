@@ -74,7 +74,7 @@ class BasePage(object):
         # 创建路径
         file_utils.make_directory(file_path)
         file_name = file_path + '/' + file_name + '_' + str(now) + IMAGE_SUBFIX_DEFAULT
-        print('file name:' + file_name)
+        log_utils.info('file name: ' + file_name)
         return br.save_screenshot(file_name)
 
     def execute_script(self, script, *args, browser=None):
@@ -255,6 +255,30 @@ class BasePage(object):
         br.close()
         br.switch_to.window(handles[0])
 
+    def scroll_next_vertical(self, css_id=None, browser=None):
+        """
+        页面向下滚动
+        :param css_id:
+        :param browser:
+        :return:
+        """
+        index = 0
+        br: WebDriver = browser if browser is not None else self.browser
+        if css_id is None:  # 整个页面滚动
+            height = br.find_element_by_tag_name('body').size.get('height')
+            if height < _BROWSER_HEIGHT:
+                pass
+            else:
+                current_scroll = 0
+                while current_scroll <= height:
+                    yield str(index)
+                    index += 1
+                    current_scroll += _BROWSER_SCROLL_VERTICAL
+                    self.execute_script('document.documentElement.scrollTop={}'.format(str(current_scroll)))
+        else:  # 具体元素滚动
+            pass
+        pass
+
     @classmethod
     def wait(cls, sec):
         """
@@ -269,6 +293,11 @@ class BasePage(object):
         if self.browser is None:
             self._browser = br
 
+
+# 浏览器高度，元素高度高于这个才可以滚动
+_BROWSER_HEIGHT = 500
+# 每次垂直滚动距离
+_BROWSER_SCROLL_VERTICAL = 400
 
 if __name__ == '__main__':
     # a = datetime.datetime.now().date()
