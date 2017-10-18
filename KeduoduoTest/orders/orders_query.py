@@ -99,7 +99,9 @@ class OrdersQueryPage(BasePage):
         handles = self.open_new_tab(self._order_detail_url.format(str(order_id)))
         self.wait(2)
 
-        self.save_screenshot('订单详情' + str(order_id))
+        scroll_generator = self.scroll_next_vertical()
+        for i in scroll_generator:
+            self.save_screenshot('订单详情_{}_滚动_{}_'.format(str(order_id), i ))
 
         self.wait(1)
 
