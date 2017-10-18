@@ -3,7 +3,7 @@ import json
 from .settings import *
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 def debug(msg, *args, **kwargs):
